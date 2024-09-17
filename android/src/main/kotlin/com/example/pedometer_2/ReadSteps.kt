@@ -2,6 +2,7 @@ package com.example.pedometer_2
 
 import android.Manifest
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -37,7 +38,7 @@ fun getSteps(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding, startTime
     }
 
     Log.d(TAG, "ActivityCompat: ${ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION)}")
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+    if (!isPermissionGranted(context)) {
         result.error("2", "Permissions have not been requested", Exception())
         return
     }
@@ -97,4 +98,15 @@ private fun aggregatedSteps(dataSet: LocalDataSet): Int {
     }
     Log.d(TAG, "aggregatedSteps-res: $steps")
     return steps
+}
+
+private fun isPermissionGranted(context: Context): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        return true
+    }
+    val permission = ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACTIVITY_RECOGNITION
+    )
+    return permission == PackageManager.PERMISSION_GRANTED
 }
